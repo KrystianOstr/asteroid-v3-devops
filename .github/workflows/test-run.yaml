@@ -31,3 +31,12 @@ jobs:
 
     - name: Run the game
       run: python main.py
+
+    - name: Save results to the file
+      run: echo"Game ran successfully in ${{matrix.python-version}} > build_output.txt
+
+    - name: Save as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Result for - ${{matrix.python-version}}
+        path: build_output.txt
