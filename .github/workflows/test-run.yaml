@@ -1,0 +1,22 @@
+name: Test Pygame
+
+on: [ push ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Pygame
+      run: pip install pygame
+
+    - name: Run the game
+      run: python main.py
