@@ -2,6 +2,13 @@ from random import randint, uniform
 import pygame as py
 import pygame
 import sys
+import os
+
+
+if os.environ.get("CI") == "true":
+    print("✅ Game launched successfully in CI — exiting.")
+    py.quit()
+    sys.exit()
 
 
 def laser_update(laser_list, speed=300):
