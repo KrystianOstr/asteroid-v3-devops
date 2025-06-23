@@ -1,0 +1,63 @@
+name: Full Pipeline
+
+on: [ push ]
+
+jobs:
+
+  # LINT JOB
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install flake8
+      run: pip install flake8
+
+    - name: Run linter
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  # TEST JOB
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run the game
+      run: python main.py
+
+  # BUILD
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Archive the game
+      run: zip -r asteroid.zip . -x "*.git*" "__pycache__/*"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-zip
+        path: asteroid.zip
