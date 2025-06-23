@@ -1,10 +1,13 @@
-name: Test Pygame
+name: Matrix Python Test
 
 on: [ push ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.10, 3.11 ]
     env:
       "CI": "true"
 
@@ -12,10 +15,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install python
+    - name: Set up python - ${{matrix.python-version}}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: ${{matrix.python-version}}
 
     - name: Install dependencies
       run: |
@@ -25,3 +28,6 @@ jobs:
       run: |
         echo "Lint run"
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Run the game
+      run: python main.py
