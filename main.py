@@ -5,12 +5,6 @@ import sys
 import os
 
 
-if os.environ.get("CI") == "true":
-    print("✅ Game launched successfully in CI — exiting.")
-    py.quit()
-    sys.exit()
-
-
 def laser_update(laser_list, speed=300):
     for rect in laser_list:
         rect.y -= round(speed * dt)
@@ -195,5 +189,10 @@ while running:
             center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
         )
         display_surface.blit(game_over_text, game_over_text_rect)
+
+    if os.environ.get("CI") == "true":
+        print("✅ Game launched successfully in CI — exiting.")
+        py.quit()
+        sys.exit()
 
     py.display.update()
