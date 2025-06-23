@@ -1,5 +1,6 @@
 from random import randint, uniform
 import pygame as py
+import pygame
 import sys
 
 
@@ -41,12 +42,20 @@ def laser_timer(can_shoot, duration=500):
     return can_shoot
 
 
+def safe_sound_load(path):
+    try:
+        return py.mixer.Sound(path)
+    except (pygame.error, AttributeError):
+        print(f"Cannot load: {path}")
+        return None
+
+
 py.init()
 
 try:
     py.mixer.init()
-except py.error:
-    print("Sound issues")
+except Exception as e:
+    print("Sound issues - ", e)
 
 clock = py.time.Clock()
 
@@ -83,11 +92,13 @@ meteor_timer = py.event.custom_type()
 py.time.set_timer(meteor_timer, 500)
 
 # import sound
-laser_sound = py.mixer.Sound("assets/sounds/laser.ogg")
-explosion_sound = py.mixer.Sound("assets/sounds/explosion.wav")
-ship_explosion_sound = py.mixer.Sound("assets/sounds/explosion.mp3")
-background_music = py.mixer.Sound("assets/sounds/music.wav")
-background_music.play(-1)
+laser_sound = safe_sound_load("assets/sounds/laser.ogg")
+explosion_sound = safe_sound_load("assets/sounds/explosion.wav")
+ship_explosion_sound = safe_sound_load("assets/sounds/explosion.mp3")
+background_music = safe_sound_load("assets/sounds/music.wav")
+if background_music:
+    background_music.play(-1)
+
 
 running = True
 game_over = False
@@ -105,7 +116,8 @@ while running:
         if event.type == py.MOUSEBUTTONDOWN and can_shoot:
             laser_rect = laser_surf.get_rect(midbottom=(ship_rect.midtop))
             laser_list.append(laser_rect)
-            laser_sound.play()
+            if laser_sound:
+                laser_sound.play()
 
             can_shoot = False
             shoot_time = py.time.get_ticks()
@@ -134,7 +146,8 @@ while running:
     for meteor_tuple in meteor_list:
         meteor_rect = meteor_tuple[0]
         if ship_rect.colliderect(meteor_rect) and not game_over:
-            ship_explosion_sound.play()
+            if ship_explosion_sound:
+                ship_explosion_sound.play()
             game_over = True
             # py.quit()
             # sys.exit()
@@ -146,7 +159,8 @@ while running:
             if laser_rect.colliderect(meteor_rect):
                 laser_list.remove(laser_rect)
                 meteor_list.remove(meteor_tuple)
-                explosion_sound.play()
+                if explosion_sound:
+                    explosion_sound.play()
 
     meteor_update(meteor_list)
 
@@ -164,7 +178,8 @@ while running:
     display_surface.blit(ship_surf, ship_rect)
 
     if game_over == True:
-        background_music.stop()
+        if background_music:
+            background_music.stop()
         display_surface.fill("Teal")
         game_over_text = font.render(
             f"Game over, press ESC to exit", True, (255, 255, 255)
