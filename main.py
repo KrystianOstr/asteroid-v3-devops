@@ -43,6 +43,11 @@ def laser_timer(can_shoot, duration=500):
 
 py.init()
 
+try:
+    py.mixer.init()
+except py.error:
+    print("Sound issues")
+
 clock = py.time.Clock()
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
